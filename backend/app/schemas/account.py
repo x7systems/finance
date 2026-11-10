@@ -8,7 +8,10 @@ from app.models.enums import AccountType
 class AccountBase(BaseModel):
     name: str = Field(min_length=1, max_length=100)
     type: AccountType = AccountType.CHECKING
-    currency: str = Field(default="USD", min_length=3, max_length=3)
+    # Same shape check as AppSettingsUpdate.currency: the UI only offers
+    # ISO 4217 codes, but the API is public and "usd" would break Intl
+    # formatting on the frontend.
+    currency: str = Field(default="USD", min_length=3, max_length=3, pattern=r"^[A-Z]{3}$")
     color: str | None = Field(default=None, pattern=r"^#[0-9a-fA-F]{6}$")
 
 
@@ -19,7 +22,7 @@ class AccountCreate(AccountBase):
 class AccountUpdate(BaseModel):
     name: str | None = Field(default=None, min_length=1, max_length=100)
     type: AccountType | None = None
-    currency: str | None = Field(default=None, min_length=3, max_length=3)
+    currency: str | None = Field(default=None, min_length=3, max_length=3, pattern=r"^[A-Z]{3}$")
     color: str | None = Field(default=None, pattern=r"^#[0-9a-fA-F]{6}$")
     is_archived: bool | None = None
 

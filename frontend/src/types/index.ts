@@ -24,6 +24,7 @@ export interface AccountWithBalance extends Account {
 export interface AccountInput {
   name: string;
   type: AccountType;
+  currency: string;
 }
 
 export interface Category {

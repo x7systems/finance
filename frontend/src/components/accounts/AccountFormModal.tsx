@@ -3,8 +3,9 @@ import { Dialog } from "@/components/ui/Dialog";
 import { Button } from "@/components/ui/Button";
 import { Input, Label, Select } from "@/components/ui/Input";
 import { useCreateAccount, useUpdateAccount } from "@/hooks/useAccounts";
-import { useTranslation, type TranslationKey } from "@/lib/i18n";
-import type { Account, AccountType } from "@/types";
+import { getCurrency, useTranslation, type TranslationKey } from "@/lib/i18n";
+import { CURRENCIES, getCurrencyLabel } from "@/lib/currency";
+import type { Account, AccountInput, AccountType } from "@/types";
 
 interface AccountFormModalProps {
   open: boolean;
@@ -14,19 +15,23 @@ interface AccountFormModalProps {
 
 const ACCOUNT_TYPES: AccountType[] = ["checking", "debit_card", "savings", "credit_card", "cash", "investment", "other"];
 
-const EMPTY_FORM = { name: "", type: "checking" as AccountType };
+// A function, not a constant: a new account starts in the app's primary
+// currency (Settings), which is only known once settings have loaded.
+function emptyForm(): AccountInput {
+  return { name: "", type: "checking", currency: getCurrency() };
+}
 
 export function AccountFormModal({ open, onClose, account }: AccountFormModalProps) {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const createAccount = useCreateAccount();
   const updateAccount = useUpdateAccount();
 
-  const [form, setForm] = useState(EMPTY_FORM);
+  const [form, setForm] = useState<AccountInput>(emptyForm);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!open) return;
-    setForm(account ? { name: account.name, type: account.type } : EMPTY_FORM);
+    setForm(account ? { name: account.name, type: account.type, currency: account.currency } : emptyForm());
     setError(null);
   }, [open, account]);
 
@@ -75,6 +80,28 @@ export function AccountFormModal({ open, onClose, account }: AccountFormModalPro
               </option>
             ))}
           </Select>
+        </div>
+
+        <div>
+          <Label htmlFor="account-currency">{t("account.form.currencyLabel")}</Label>
+          <Select
+            id="account-currency"
+            value={form.currency}
+            onChange={(event) => setForm((prev) => ({ ...prev, currency: event.target.value }))}
+          >
+            {/* An account saved with a code outside the curated list (e.g.
+                via the API) must still show its own currency, not silently
+                switch to the first option on the next save. */}
+            {!CURRENCIES.some((currency) => currency.code === form.currency) && (
+              <option value={form.currency}>{form.currency}</option>
+            )}
+            {CURRENCIES.map((currency) => (
+              <option key={currency.code} value={currency.code}>
+                {getCurrencyLabel(currency.code, language)}
+              </option>
+            ))}
+          </Select>
+          <p className="mt-1 text-xs text-text-muted">{t("account.form.currencyHint")}</p>
         </div>
 
         {error && <p className="text-sm text-danger">{error}</p>}

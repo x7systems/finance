@@ -465,6 +465,8 @@ const ru = {
   "account.form.nameLabel": "Название",
   "account.form.namePlaceholder": "Основной счёт, накопления, наличные…",
   "account.form.typeLabel": "Тип",
+  "account.form.currencyLabel": "Валюта",
+  "account.form.currencyHint": "Суммы этого счёта ведутся в этой валюте. Смена валюты не пересчитывает уже внесённые суммы.",
   "account.form.saveError": "Не удалось сохранить счёт. Проверьте данные и попробуйте снова.",
 
   "category.expenseSectionTitle": "Категории расходов",
@@ -990,6 +992,8 @@ const en: Record<keyof typeof ru, string> = {
   "account.form.nameLabel": "Name",
   "account.form.namePlaceholder": "Main account, savings, cash…",
   "account.form.typeLabel": "Type",
+  "account.form.currencyLabel": "Currency",
+  "account.form.currencyHint": "This account's amounts are kept in this currency. Changing it does not convert amounts already entered.",
   "account.form.saveError": "Failed to save the account. Check the data and try again.",
 
   "category.expenseSectionTitle": "Expense categories",
